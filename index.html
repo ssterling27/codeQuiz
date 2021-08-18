@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Quiz</title>
+  <link rel="stylesheet" href="./reset.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <style>
+      .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .answer {
+        padding-bottom: 15px;
+        border: 1.5px solid blue;
+      }
+    </style>
+</head>
+<body>
+  <section class="container">
+    <div class="row row1">
+      <div class="col-sm-12">
+        <h1 class="center" style="margin-top:20px;">Code Quiz</h1>
+      </div>
+    </div><hr>
+    <div class="row row2">
+      <div class="col-sm-3"></div>
+      <div class="col-sm-6">
+        <section id="highscore" class="center nav-item nav-link">View High Scores</section>
+      </div>
+    </div><hr>
+    <div class="row row3">
+      <div class="col-sm-3"></div>
+      <div class="col-sm-6 center" id="plane">
+        <button type="submit" class="btn btn-primary center" id="start">Start</button>
+    </div>
+    <div class="row row4">
+      <div id="timerHere" class="col-sm-3">
+        
+      </div>
+      <div id="questionsHere" class="col-sm-9"></div>
+    </div>
+  </section>
+  <script src="./questions.js"></script>
+  <script>
+    let seconds = 60
+    let correct = 0
+      let wrong = 0
+      let i = 0
+      let random = 0
+      let answerKey = ''
+    const endGame = () => {
+        let endGameMessage = ''
+        if (correct > 7) {
+          endGameMessage = `Nice job!`
+        } else {
+          endGameMessage = `Better luck next time!`
+        }
+        let endGameElem = document.createElement('section')
+        endGameElem.innerHTML = `
+      <div class="card" style="width: 100%;">
+        <div class="card-body">
+          <h2>Finished</h2>
+          <p>Right answers: ${correct}</p>
+          <p>Wrong Answers: ${wrong}</p>
+          <p>${endGameMessage}</p>
+          <button type="submit" class="btn btn-primary center restart" id="restart">Try Again?</button>
+        </div>
+      </div>
+      `
+        document.getElementById('questionsHere').append(endGameElem)
+        document.getElementById('timerHere').remove()
+        seconds = ''
+      }
+    const startCounting = () => {
+        const count = setInterval(() => {
+        if (seconds > 0) {
+          seconds--
+          document.getElementById('timer').textContent = seconds
+        } else {
+          document.getElementById('quizElem').remove()
+          endGame()
+          clearInterval(count)
+        }
+        }, 1000)
+      }
+    // if (seconds === 0) {
+    //   endGame()
+    
+    // for (let i = 0; i < 10; i++) {
+      
+      const generateQuestion = () => {
+      random = (Math.floor(Math.random() * (9 - i)))
+
+      // let randomQuestion = jsQuestions[Math.floor(Math.random() * (9 - i))]
+      console.log(jsQuestions[random].title)
+      let choice1 = jsQuestions[random].choices[0]
+      let choice2 = jsQuestions[random].choices[1]
+      let choice3 = jsQuestions[random].choices[2]
+      let choice4 = jsQuestions[random].choices[3]
+      // console.log(choice1)
+      let quizElem = document.createElement('section')
+      quizElem.id = 'quizElem'
+      quizElem.innerHTML = `
+    <div class="card" style="width: 100%;">
+      <div class="card-body">
+        <h2>${jsQuestions[random].title}</h2>
+        <div class="btn-group-vertical center" role="group" aria-label="answers">
+          <button type="button" class="answer btn btn-light">${choice1}</button>
+          <button type="button" class="answer btn btn-light">${choice2}</button>
+          <button type="button" class="answer btn btn-light">${choice3}</button>
+          <button type="button" class="answer btn btn-light">${choice4}</button>
+        </div>
+      </div>
+    </div>
+    `
+      answerKey = `${jsQuestions[random].answer}`
+      document.getElementById('questionsHere').append(quizElem)
+      jsQuestions.splice(random, 1)
+      i++
+      
+    }  
+    
+    document.getElementById('start').addEventListener('click', event => {
+        event.preventDefault()
+        generateQuestion()
+        document.getElementById('start').remove()
+        let timerElem = document.createElement('section')
+        timerElem.innerHTML = `
+        <div class="card" style="width: 100%; height: 275px;">
+          <div class="card-body">
+            <br><br>
+            <h4 class="center">Time Left:</h4>
+            <h2 id="timer" class="center">60</h2>
+            <h4 class="center">seconds</h4>
+          </div>
+        </div>
+        `
+        document.getElementById('timerHere').append(timerElem)
+        startCounting()
+      })
+    
+    
+
+    document.addEventListener('click', event => {
+      if (event.target.classList.contains('answer')) {
+        // console.log(event.target.textContent)
+        // console.log(answerKey)
+        if (event.target.textContent == answerKey) {
+          console.log('correct!')
+          correct++
+        } else {
+          console.log('wrong!')
+          wrong++
+        }
+        event.target.parentNode.parentNode.parentNode.parentNode.remove()
+        if (i < 10) {
+        generateQuestion()
+        } else {
+          endGame()
+        }
+      }
+    })
+    document.addEventListener('click', event => {
+        if (event.target.classList.contains('restart')) {
+          window.location.reload(false)
+        }
+      })
+  
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+</body>
+</html>
